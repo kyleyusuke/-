@@ -106,82 +106,82 @@ body{
   font-family:"Noto Sans JP","Noto Sans CJK JP","Hiragino Sans",sans-serif;
   font-feature-settings:"palt"; overflow:hidden; -webkit-font-smoothing:antialiased;
 }
-.app{height:100vh;display:grid;grid-template-rows:1fr auto auto auto;gap:2.4vh;padding:3vh 2.6vw}
+.app{height:100vh;display:grid;grid-template-rows:minmax(0,1fr) auto auto auto;gap:2.2vh;padding:2.6vh 2.6vw}
 
 /* ===== メイン ===== */
 main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw;min-height:0}
 .hero{
   position:relative;border-radius:3.2vh;padding:2.6vh 2.2vw;display:flex;flex-direction:column;gap:1.6vh;
-  color:#fff;min-height:0;overflow:hidden;box-shadow:0 1.2vh 3vh rgba(0,0,0,.08);
+  color:#fff;min-height:0;overflow:hidden;box-shadow:0 calc(var(--u)*1.2) calc(var(--u)*3) rgba(0,0,0,.08);
 }
-.hero .tag{position:absolute;top:2.4vh;right:2vw;z-index:2;background:#fff;color:var(--ink);
+.hero .tag{position:absolute;top:calc(var(--u)*2.4);right:calc(var(--u)*3.4);z-index:2;background:#fff;color:var(--ink);
   font-weight:900;font-size:3vh;border-radius:99px;padding:.5vh 1.4vw;box-shadow:0 .4vh 1vh rgba(0,0,0,.15)}
-.hero .items{flex:1;display:flex;flex-direction:column;gap:1.6vh;min-height:0}
-.hero .item{flex:1;display:flex;align-items:center;gap:2.6vw;min-height:0;min-width:0;padding:0 1vw}
+.hero .items{flex:1;display:flex;flex-direction:column;gap:calc(var(--u)*1.6);min-height:0}
+.hero .item{flex:1;display:flex;align-items:center;gap:calc(var(--u)*4.42);min-height:0;min-width:0;padding:0 calc(var(--u)*1.7)}
 .hero .txt{min-width:0;flex:1}
-.ico{flex:none;width:39vh;height:28vh;border-radius:3vh;background:#fff;display:grid;place-items:center;
+.ico{flex:none;width:calc(var(--u)*39);height:calc(var(--u)*28);border-radius:calc(var(--u)*3);background:#fff;display:grid;place-items:center;
   box-shadow:0 .8vh 1.6vh rgba(0,0,0,.12)}
 .ico svg,.ico img{width:88%;height:86%;object-fit:contain}
-.hero .name{font-size:18vh;font-weight:900;line-height:1.02;white-space:nowrap;letter-spacing:-.01em}
-.hero .sub{font-size:3.4vh;font-weight:700;opacity:.92;margin-top:.8vh;white-space:nowrap}
-.hero .note{font-size:3vh;font-weight:700;align-self:flex-start;background:rgba(0,0,0,.2);border-radius:99px;padding:.7vh 1.6vw}
+.hero .name{font-size:calc(var(--u)*18);font-weight:900;line-height:1.02;white-space:nowrap;letter-spacing:-.01em}
+.hero .sub{font-size:calc(var(--u)*3.4);font-weight:700;opacity:.92;margin-top:calc(var(--u)*.8);white-space:nowrap}
+.hero .note{font-size:calc(var(--u)*3);font-weight:700;align-self:flex-start;background:rgba(0,0,0,.2);border-radius:99px;padding:calc(var(--u)*.7) calc(var(--u)*2.72)}
 /* 複数種類の日 */
 .hero.multi{background:#2A2723}
-.hero.multi .item{background:var(--c);border-radius:2.6vh;padding:1.2vh 1.8vw;gap:2vw}
-.hero.multi .ico{width:21vh;height:15vh;border-radius:2vh}
-.hero.multi .name{font-size:11vh}
-.hero.multi .sub{font-size:2.6vh;margin-top:.2vh}
-.hero.multi.three .ico{width:14vh;height:10vh}
-.hero.multi.three .name{font-size:7.5vh}
+.hero.multi .item{background:var(--c);border-radius:calc(var(--u)*2.6);padding:calc(var(--u)*1.2) calc(var(--u)*3.06);gap:calc(var(--u)*3.4)}
+.hero.multi .ico{width:calc(var(--u)*21);height:calc(var(--u)*15);border-radius:calc(var(--u)*2)}
+.hero.multi .name{font-size:calc(var(--u)*11)}
+.hero.multi .sub{font-size:calc(var(--u)*2.6);margin-top:calc(var(--u)*.2)}
+.hero.multi.three .ico{width:calc(var(--u)*14);height:calc(var(--u)*10)}
+.hero.multi.three .name{font-size:calc(var(--u)*7.5)}
 /* 左カラム（メイン＋詳細） */
-.left{display:flex;flex-direction:column;gap:1.8vh;min-height:0}
+.left{--u:1vh;display:flex;flex-direction:column;gap:calc(var(--u)*1.8);min-height:0}
 .left .hero{flex:1}
-.detail{flex:none;max-height:42%;overflow:hidden;background:var(--card);border-radius:3vh;padding:1.6vh 1.8vw;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:1.4vh 2vw}
+.detail{flex:none;background:var(--card);border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.6) calc(var(--u)*3.06);display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:calc(var(--u)*1.4) calc(var(--u)*3.4)}
 .detail.many{grid-auto-flow:row;grid-template-columns:1fr 1fr}
-.grp .it{font-size:1.95vh;font-weight:500;line-height:1.5}
+.grp .it{font-size:calc(var(--u)*1.95);font-weight:500;line-height:1.5}
 .detail:empty{display:none}
 .grp{min-width:0}
-.grp h3{display:flex;align-items:center;gap:.6vw;font-size:2.4vh;font-weight:900;color:var(--c);margin-bottom:.5vh}
-.grp h3 .dot{width:1.4vh;height:1.4vh;border-radius:50%;background:var(--c)}
-.grp ul{list-style:none;display:flex;flex-wrap:wrap;gap:.6vh .4vw}
-.grp li{font-size:2vh;font-weight:500;background:#F4F1EB;border-radius:.8vh;padding:.25vh .6vw;white-space:nowrap}
-.grp .warn{margin-top:.5vh;font-size:1.85vh;color:#B4452B;font-weight:700}
-.left.has-detail .hero .ico{width:28vh;height:20vh}
-.left.has-detail .hero .name{font-size:13vh}
-.left.has-detail .hero.multi .ico{width:14vh;height:10vh;border-radius:1.4vh}
-.left.has-detail .hero.multi .name{font-size:8vh}
+.grp h3{display:flex;align-items:center;gap:calc(var(--u)*1.02);font-size:calc(var(--u)*2.4);font-weight:900;color:var(--c);margin-bottom:calc(var(--u)*.5)}
+.grp h3 .dot{width:calc(var(--u)*1.4);height:calc(var(--u)*1.4);border-radius:50%;background:var(--c)}
+.grp ul{list-style:none;display:flex;flex-wrap:wrap;gap:calc(var(--u)*.6) calc(var(--u)*0.68)}
+.grp li{font-size:calc(var(--u)*2);font-weight:500;background:#F4F1EB;border-radius:calc(var(--u)*.8);padding:calc(var(--u)*.25) calc(var(--u)*1.02);white-space:nowrap}
+.grp .warn{margin-top:calc(var(--u)*.5);font-size:calc(var(--u)*1.85);color:#B4452B;font-weight:700}
+.left.has-detail .hero .ico{width:calc(var(--u)*28);height:calc(var(--u)*20)}
+.left.has-detail .hero .name{font-size:calc(var(--u)*13)}
+.left.has-detail .hero.multi .ico{width:calc(var(--u)*14);height:calc(var(--u)*10);border-radius:calc(var(--u)*1.4)}
+.left.has-detail .hero.multi .name{font-size:calc(var(--u)*8)}
 .left.has-detail .hero.multi .sub{display:none}
-.left.has-detail .hero.multi .item{padding:.6vh 1.6vw}
+.left.has-detail .hero.multi .item{padding:calc(var(--u)*.6) calc(var(--u)*2.72)}
 /* 軒下回収バナー */
-.noki{flex:none;display:flex;align-items:center;gap:1.4vw;background:#FFD23F;color:#1F1D1A;
+.noki{flex:none;display:flex;align-items:center;gap:calc(var(--u)*2.38);background:#FFD23F;color:#1F1D1A;
   border-radius:2.2vh;padding:1.2vh 1.6vw;box-shadow:0 .6vh 1.4vh rgba(0,0,0,.15);
-  background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.05) 0 1.2vh,transparent 1.2vh 2.4vh)}
-.noki .h{font-size:4.6vh;line-height:1}
-.noki .t{font-size:4.2vh;font-weight:900;white-space:nowrap;line-height:1.15}
-.noki .i{font-size:2.3vh;font-weight:700;opacity:.85}
+  background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.05) 0 calc(var(--u)*1.2),transparent calc(var(--u)*1.2) calc(var(--u)*2.4))}
+.noki .h{font-size:calc(var(--u)*4.6);line-height:1}
+.noki .t{font-size:calc(var(--u)*4.2);font-weight:900;white-space:nowrap;line-height:1.15}
+.noki .i{font-size:calc(var(--u)*2.3);font-weight:700;opacity:.85}
 /* 収集なし */
-.hero.none{background:var(--card);color:var(--ink);border:.3vh solid var(--line);box-shadow:none}
+.hero.none{background:var(--card);color:var(--ink);border:calc(var(--u)*.3) solid var(--line);box-shadow:none}
 .hero.none .name{color:var(--sub)}
 .hero.none .ico{background:#F4F1EB;box-shadow:none}
 
 /* ===== 右：この先の予定 ===== */
-.side{background:var(--card);border-radius:3.2vh;padding:2.6vh 1.6vw;display:flex;flex-direction:column;min-height:0}
-.side h2{font-size:2.6vh;color:var(--sub);font-weight:700;margin-bottom:.6vh}
+.side{--s:1vh;background:var(--card);border-radius:calc(var(--s)*3.2);padding:calc(var(--s)*2.6) calc(var(--s)*2.72);display:flex;flex-direction:column;min-height:0}
+.side h2{font-size:calc(var(--s)*2.6);color:var(--sub);font-weight:700;margin-bottom:calc(var(--s)*.6)}
 .days{flex:1;display:grid;grid-template-rows:repeat(6,minmax(0,1fr));min-height:0}
-.day{font-size:2.7vh;display:grid;grid-template-columns:6.2em 1fr;align-items:center;align-content:center;gap:.5vw;padding:.6vh 0;border-bottom:1px solid var(--line);min-height:0}
+.day{font-size:calc(var(--s)*2.7);display:grid;grid-template-columns:6.2em 1fr;align-items:center;align-content:center;gap:calc(var(--s)*0.85);padding:calc(var(--s)*.6) 0;border-bottom:1px solid var(--line);min-height:0}
 .day:last-child{border-bottom:none}
 .day .d{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .sun{color:#D64545}.sat{color:#2F6FC0}
-.chips{display:flex;flex-wrap:wrap;align-items:center;gap:.6vh .4vw}
-.chip{display:inline-flex;align-items:center;gap:.5vw;font-size:2.4vh;font-weight:900;color:#fff;background:var(--c);
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:calc(var(--s)*.6) calc(var(--s)*0.68)}
+.chip{display:inline-flex;align-items:center;gap:calc(var(--s)*0.85);font-size:calc(var(--s)*2.4);font-weight:900;color:#fff;background:var(--c);
   border-radius:1.4vh;padding:.3vh 1vw .3vh .3vh;white-space:nowrap}
-.chip .ci{width:5.4vh;height:3.8vh;border-radius:1vh;background:#fff;display:grid;place-items:center}
+.chip .ci{width:calc(var(--s)*5.4);height:calc(var(--s)*3.8);border-radius:calc(var(--s)*1);background:#fff;display:grid;place-items:center}
 .chip .ci svg,.chip .ci img{width:92%;height:90%;object-fit:contain}
 .chip.none{background:none;color:#B8B1A6;padding-left:0;font-weight:700}
 .chip.noki{background:#FFD23F;color:#1F1D1A;padding-left:1vw}
 .day.first .d{font-size:1.12em}
-.day.first .chip{font-size:2.7vh}
-.day.first .chip .ci{width:6.2vh;height:4.4vh}
+.day.first .chip{font-size:calc(var(--s)*2.7)}
+.day.first .chip .ci{width:calc(var(--s)*6.2);height:calc(var(--s)*4.4)}
 
 /* ===== インフォメーションバー ===== */
 .bar{background:var(--card);border-radius:3.2vh;padding:2vh 2.2vw;display:grid;
@@ -218,7 +218,7 @@ main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw
 .slot .t{position:relative;font-size:1.7vh;color:var(--sub);font-weight:400}
 .slot .p{font-size:1.9vh;font-weight:500;color:#2F7DD1;font-variant-numeric:tabular-nums}
 .slot.past{opacity:.35}
-.status{position:fixed;right:2.6vw;bottom:.6vh;font-size:1.6vh;color:#B8B1A6}
+.status{display:none}
 .status.warn{color:#D64545;font-weight:700;font-size:2vh}
 
 /* 動く天気アイコン */
@@ -417,6 +417,28 @@ function isNoki(d) {
   return !!nk && matches(nk.rule, d) && !(ymd(d) in (CONFIG.exceptions || {}));
 }
 
+/* 左カラム（メイン＋詳細）が枠に収まるまで全体を縮める */
+function fitLeft() {
+  const left = document.getElementById("left");
+  if (!left) return;
+  let u = window.innerHeight / 100;
+  left.style.setProperty("--u", u + "px");
+  const over = () => left.scrollHeight > left.clientHeight + 1 ||
+    [...left.querySelectorAll(".hero,.detail,.grp,.noki,.item")].some(e => e.scrollHeight > e.clientHeight + 1);
+  let guard = 0;
+  while (over() && guard++ < 40) { u *= 0.96; left.style.setProperty("--u", u + "px"); }
+}
+function refit() { fitNames(); fitLeft(); fitNames(); fitSide(); fitDate(); }
+/* 右の予定リストも同様に */
+function fitSide() {
+  const side = document.querySelector(".side");
+  if (!side) return;
+  let s = window.innerHeight / 100;
+  side.style.setProperty("--s", s + "px");
+  const over = () => [...side.querySelectorAll(".days,.day")].some(e => e.scrollHeight > e.clientHeight + 1);
+  let guard = 0;
+  while (over() && guard++ < 40) { s *= 0.96; side.style.setProperty("--s", s + "px"); }
+}
 /* 文字が枠からはみ出す時だけ自動で縮める */
 function fitNames() {
   document.querySelectorAll(".hero .name").forEach(el => {
@@ -469,7 +491,7 @@ function renderGarbage(now) {
       ${many ? `<div class="it">${x.items.join("／")}</div>` : `<ul>${x.items.map(i => `<li>${i}</li>`).join("")}</ul>`}
       ${x.warn ? `<div class="warn">⚠ ${x.warn}</div>` : ""}</div>`).join("");
   document.getElementById("left").classList.toggle("has-detail", groups.length > 0);
-  fitNames();
+  refit();
 
   // この先の予定（メイン表示の翌日から6日分）
   let html = "";
@@ -487,6 +509,7 @@ function renderGarbage(now) {
   document.getElementById("days").innerHTML = html;
 
   renderNotice(now);
+  refit();
 }
 
 /* ---------- カレンダーの期限お知らせ ---------- */
@@ -664,6 +687,7 @@ function renderWeather() {
   }
   const st = document.getElementById("status");
   if (!st.classList.contains("warn")) st.textContent = `天気更新 ${pad(j._at.getHours())}:${pad(j._at.getMinutes())}`;
+  refit();
 }
 
 /* ---------- 気象警報・注意報（気象庁 防災情報） ---------- */
@@ -697,10 +721,11 @@ async function loadAlerts() {
       }
     }
     const list = [...active.values()].sort((a, b) => b[1] - a[1]);
-    if (!list.length) { el.className = "alert"; el.innerHTML = ""; return; }
+    if (!list.length) { if (el.innerHTML) { el.className = "alert"; el.innerHTML = ""; setTimeout(refit, 0); } return; }
     const top = list[0][1];
     const icon = top >= 3 ? "⚠️" : "⚠";
     el.className = `alert on lv${top}`;
+    setTimeout(refit, 0);
     el.innerHTML = `<div class="ai">${icon}</div><div class="al">${CONFIG.location.name}に<br>発表中</div>
       <div class="items">${list.map(([n, lv]) => `<span class="it">${n}${LEVELED.some(x => n.startsWith(x)) ? `<small>レベル${lv}</small>` : ""}</span>`).join("")}</div>`;
   } catch (e) {
@@ -735,8 +760,8 @@ document.addEventListener("visibilitychange", () => {
   // 画面に戻ってきた時、天気が15分以上前なら取り直す
   if (!lastWx || Date.now() - lastWx._at > 15 * 60 * 1000) { loadWeather(); loadAlerts(); }
 });
-if (document.fonts) document.fonts.ready.then(() => { fitNames(); fitDate(); });
-window.addEventListener("resize", () => { fitNames(); fitDate(); });
+if (document.fonts) document.fonts.ready.then(refit);
+window.addEventListener("resize", refit);
 </script>
 </body>
 </html>
