@@ -14,7 +14,7 @@
 <script>
 /* =========================================================
    ★ 設定はここだけ編集すればOK ★
-   松戸市 ごみ出しカレンダー「A-月曜日」地区（2026年4月〜2027年3月版）より
+   松戸市 ごみ出しカレンダー「B-水曜日」地区（2026年4月〜2027年3月版）より
    ========================================================= */
 const CONFIG = {
   // 天気の場所（緯度・経度）
@@ -27,7 +27,7 @@ const CONFIG = {
     ignore: ["21", "24", "25", "26", "17", "22"] },
 
   // 何時以降は「明日のゴミ」をメインに表示するか（0〜23）。常に今日を出すなら null
-  switchToTomorrowHour: 12,
+  switchToTomorrowHour: null,
 
   // メイン表示の下に出すメモ
   note: "集積所に 朝 8:30 まで",
@@ -42,11 +42,11 @@ const CONFIG = {
   //   name=大きく出す名前 / sub=小さく添える説明 / short=予定リスト用
   garbage: [
     { key: "kanen",  name: "可燃ごみ",   sub: "",                       short: "可燃",       icon: "bag",    color: "#1F86C9", rule: { weekdays: [2, 4, 6] } },
-    { key: "funen",  name: "不燃・有害", sub: "不燃ごみ・有害ごみ",       short: "不燃・有害", icon: "spray",  color: "#3C9A56", rule: { weekdays: [1] } },
-    { key: "bin",    name: "ビン・缶",   sub: "資源ごみ",                 short: "ビン・缶",   icon: "bottle", color: "#E8871E", rule: { everyOtherWeek: { weekday: 1, start: "2026-09-07" } } },
-    { key: "kami",   name: "紙・布",     sub: "資源ごみ",                 short: "紙・布",     icon: "paper",  color: "#C2417F", rule: { everyOtherWeek: { weekday: 1, start: "2026-09-14" } } },
-    { key: "ripura", name: "リプラ",     sub: "リサイクルするプラスチック", short: "リプラ",     icon: "tray",   color: "#7E5FC2", rule: { weekdays: [3] } },
-    { key: "tapura", name: "他プラ",     sub: "その他のプラスチックなど",   short: "他プラ",     icon: "ball",   color: "#E0578F", rule: { weekdays: [5] } },
+    { key: "funen",  name: "不燃・有害", sub: "不燃ごみ・有害ごみ",       short: "不燃・有害", icon: "spray",  color: "#3C9A56", rule: { weekdays: [3] } },
+    { key: "bin",    name: "ビン・缶",   sub: "資源ごみ",                 short: "ビン・缶",   icon: "bottle", color: "#E8871E", rule: { everyOtherWeek: { weekday: 3, start: "2026-04-08" } } },
+    { key: "kami",   name: "紙・布",     sub: "資源ごみ",                 short: "紙・布",     icon: "paper",  color: "#C2417F", rule: { everyOtherWeek: { weekday: 3, start: "2026-04-01" } } },
+    { key: "ripura", name: "リプラ",     sub: "リサイクルするプラスチック", short: "リプラ",     icon: "tray",   color: "#7E5FC2", rule: { weekdays: [5] } },
+    { key: "tapura", name: "他プラ",     sub: "その他のプラスチックなど",   short: "他プラ",     icon: "ball",   color: "#E0578F", rule: { weekdays: [1] } },
   ],
 
   // ▼ 詳しい分け方（メインの下に表示。松戸市「家庭ごみの分け方出し方」より）
@@ -106,7 +106,7 @@ body{
   font-family:"Noto Sans JP","Noto Sans CJK JP","Hiragino Sans",sans-serif;
   font-feature-settings:"palt"; overflow:hidden; -webkit-font-smoothing:antialiased;
 }
-.app{height:100vh;display:grid;grid-template-rows:1fr auto auto;gap:2.4vh;padding:3vh 2.6vw}
+.app{height:100vh;display:grid;grid-template-rows:1fr auto auto auto;gap:2.4vh;padding:3vh 2.6vw}
 
 /* ===== メイン ===== */
 main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw;min-height:0}
@@ -264,6 +264,14 @@ main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw
   .rotate{display:flex;height:100vh;flex-direction:column;align-items:center;justify-content:center;gap:2vh;font-size:5vw;font-weight:700;color:var(--sub)}
   .rotate b{font-size:16vw}
 }
+/* カレンダー更新のお知らせ */
+.notice{display:none;align-items:center;gap:1.2vw;border-radius:2.4vh;padding:1.1vh 2vw;margin-top:-.6vh;
+  background:#FFF4D6;color:#6B4A00;border:.3vh dashed #E0A000}
+.notice.on{display:flex}
+.notice .ni{font-size:3.4vh;line-height:1}
+.notice .nt{font-size:2.6vh;font-weight:700}
+.notice .ns{font-size:2vh;font-weight:500;opacity:.85}
+.notice.expired{background:#FDE7E4;color:#8A1F12;border-color:#D93A2B}
 /* 縦置き */
 @media (orientation:portrait){
   main{grid-template-columns:1fr;grid-template-rows:1.4fr 1fr}
@@ -302,6 +310,7 @@ main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw
     </div>
   </footer>
   <div class="alert" id="alert"></div>
+  <div class="notice" id="notice"></div>
 </div>
 <div class="status" id="status"></div>
 <div class="rotate"><b>↻</b>横向きにしてください</div>
@@ -477,10 +486,27 @@ function renderGarbage(now) {
   }
   document.getElementById("days").innerHTML = html;
 
-  if (CONFIG.validUntil && ymd(now) > CONFIG.validUntil) {
-    const st = document.getElementById("status");
-    st.className = "status warn";
-    st.textContent = "ゴミカレンダーの期限が切れています。新しい年度の内容に更新してください";
+  renderNotice(now);
+}
+
+/* ---------- カレンダーの期限お知らせ ---------- */
+function renderNotice(now) {
+  const el = document.getElementById("notice");
+  if (!CONFIG.validUntil) return;
+  const [y, m, d] = CONFIG.validUntil.split("-").map(Number);
+  const end = new Date(y, m - 1, d);
+  const daysLeft = Math.round((end - startOfDay(now)) / 86400000);
+  const next = addDays(end, 1);
+  if (daysLeft < 0) {
+    el.className = "notice on expired";
+    el.innerHTML = `<div class="ni">⚠️</div><div><div class="nt">ゴミカレンダーの期限が切れています</div>
+      <div class="ns">表示が正しくない可能性があります。${next.getMonth()+1}月からの新しいカレンダーに更新してください</div></div>`;
+  } else if (daysLeft <= 7) {
+    el.className = "notice on";
+    el.innerHTML = `<div class="ni">📅</div><div><div class="nt">ゴミカレンダーは ${m}/${d} までです（あと${daysLeft}日）</div>
+      <div class="ns">${next.getMonth()+1}月からの新しいカレンダーを市のサイトで確認して、更新してください</div></div>`;
+  } else {
+    el.className = "notice"; el.innerHTML = "";
   }
 }
 
