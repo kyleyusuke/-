@@ -167,8 +167,8 @@ main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw
 /* ===== 右：この先の予定 ===== */
 .side{background:var(--card);border-radius:3.2vh;padding:2.6vh 1.6vw;display:flex;flex-direction:column;min-height:0}
 .side h2{font-size:2.6vh;color:var(--sub);font-weight:700;margin-bottom:.6vh}
-.days{flex:1;display:flex;flex-direction:column;justify-content:space-between}
-.day{font-size:2.7vh;display:grid;grid-template-columns:6.2em 1fr;align-items:center;gap:.5vw;padding:.8vh 0;border-bottom:1px solid var(--line)}
+.days{flex:1;display:grid;grid-template-rows:repeat(6,minmax(0,1fr));min-height:0}
+.day{font-size:2.7vh;display:grid;grid-template-columns:6.2em 1fr;align-items:center;align-content:center;gap:.5vw;padding:.6vh 0;border-bottom:1px solid var(--line);min-height:0}
 .day:last-child{border-bottom:none}
 .day .d{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .sun{color:#D64545}.sat{color:#2F6FC0}
@@ -186,11 +186,21 @@ main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw
 /* ===== インフォメーションバー ===== */
 .bar{background:var(--card);border-radius:3.2vh;padding:2vh 2.2vw;display:grid;
   grid-template-columns:auto auto auto auto 1fr;align-items:center;gap:2.2vw;letter-spacing:.02em}
-.dt{display:flex;flex-direction:column;gap:.2vh;padding-right:2.2vw;border-right:1px solid var(--line)}
-.dt .date{font-size:3.1vh;font-weight:500;white-space:nowrap}
-.dt .clock{font-size:8vh;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.dt{display:flex;flex-direction:column;align-items:flex-start;gap:.4vh;padding-right:2.4vw;border-right:1px solid var(--line)}
+.dt .date{display:flex;align-items:baseline;justify-content:space-between;font-size:3.1vh;font-weight:500;white-space:nowrap;line-height:1.1}
+.dt .date .y{margin-right:.15em}
+.dt .date span{font-weight:500}
+.dt .clock{display:flex;align-items:center;font-size:8.4vh;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:0}
+.dg{position:relative;display:inline-block;width:.6em;height:1.12em;overflow:hidden;perspective:3em}
+.dg span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;transform-origin:center}
+.dg .in{animation:rollIn .75s cubic-bezier(.22,1,.36,1) .06s both}
+.dg .out{animation:rollOut .55s cubic-bezier(.55,0,.8,.3) both}
+@keyframes rollIn{0%{transform:translateY(-100%) rotateX(60deg);opacity:0}40%{opacity:1}100%{transform:translateY(0) rotateX(0);opacity:1}}
+@keyframes rollOut{0%{transform:translateY(0) rotateX(0);opacity:1}60%{opacity:0}100%{transform:translateY(100%) rotateX(-60deg);opacity:0}}
+.colon{display:inline-block;width:.34em;text-align:center;transform:translateY(-.07em);animation:softblink 2.6s ease-in-out infinite}
+@keyframes softblink{0%,100%{opacity:1}50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.dg span,.colon{animation:none!important}}
 .wxmain{display:flex;align-items:center;gap:.8vw}
-.wxmain .big-icon{font-size:8vh;line-height:1}
 .wxmain .cond{font-size:3.1vh;font-weight:700;white-space:nowrap}
 .wxmain .place{font-size:1.9vh;color:var(--sub);font-weight:400}
 .now{font-size:7vh;font-weight:500;font-variant-numeric:tabular-nums;line-height:1;white-space:nowrap}
@@ -205,13 +215,35 @@ main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw
 .rain .tmr .hi{color:var(--hot)}.rain .tmr .lo{color:var(--cold)}
 .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:.5vw}
 .slot{border-radius:1.2vh;padding:.5vh .3vw;text-align:center;background:#F4F1EB;display:flex;flex-direction:column;align-items:center}
-.slot .wi{font-size:4.2vh;line-height:1.1}
 .slot .t{position:relative;font-size:1.7vh;color:var(--sub);font-weight:400}
 .slot .p{font-size:1.9vh;font-weight:500;color:#2F7DD1;font-variant-numeric:tabular-nums}
 .slot.past{opacity:.35}
 .status{position:fixed;right:2.6vw;bottom:.6vh;font-size:1.6vh;color:#B8B1A6}
 .status.warn{color:#D64545;font-weight:700;font-size:2vh}
 
+/* 動く天気アイコン */
+.wxi{display:block;width:100%;height:100%;overflow:visible}
+.wxi .rays{transform-box:fill-box;transform-origin:center;animation:spin 40s linear infinite}
+.wxi .sunc{transform-box:fill-box;transform-origin:center;animation:glow 3s ease-in-out infinite}
+.wxi .cl{transform-box:fill-box;transform-origin:center bottom;animation:breathe 6s ease-in-out infinite}
+.wxi .drop{animation:fall 1.1s linear infinite}
+.wxi .flake{animation:snow 2.6s linear infinite}
+.wxi .bolt{animation:flash 3.2s steps(1) infinite}
+.wxi .b2{animation-duration:4.1s;animation-delay:-1.4s}
+.wxi .fogl{animation:fade 5s ease-in-out infinite}
+.wxi .d2{animation-delay:-.37s}.wxi .d3{animation-delay:-.73s}
+.wxi .f2{animation-delay:-.9s}.wxi .f3{animation-delay:-1.7s}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes glow{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-.8px) scale(1.025)}}
+@keyframes fade{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes fall{0%{transform:translateY(-3px);opacity:0}20%{opacity:1}100%{transform:translateY(10px);opacity:0}}
+@keyframes snow{0%{transform:translate(0,-3px);opacity:0}20%{opacity:1}50%{transform:translate(1.5px,4px)}100%{transform:translate(-1px,11px);opacity:0}}
+@keyframes flash{0%,100%{opacity:.25}8%{opacity:1}12%{opacity:.3}16%{opacity:1}22%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.wxi *{animation:none!important}}
+.wxmain .big-icon{width:10vh;height:10vh}
+.slot .wi{width:5.4vh;height:5.4vh;margin:.1vh 0}
+.rain .tmr .ti{display:inline-block;width:2.6vh;height:2.6vh;vertical-align:-.6vh}
 /* 気象警報・注意報の帯 */
 .alert{display:none;align-items:center;gap:1.4vw;border-radius:2.4vh;padding:1.3vh 2vw;color:#fff;margin-top:-.6vh}
 .alert.on{display:flex}
@@ -453,10 +485,41 @@ function renderGarbage(now) {
 }
 
 /* ---------- 描画：日付・時計 ---------- */
+function setDigit(box, ch) {
+  const cur = box.querySelector("span:not(.out)");
+  if (cur && cur.textContent === ch) return;
+  const next = document.createElement("span");
+  next.textContent = ch;
+  if (cur) {                       // 2回目以降だけアニメーション
+    next.className = "in";
+    cur.className = "out";
+    setTimeout(() => cur.remove(), 800);
+  }
+  box.appendChild(next);
+}
 function renderClock(now) {
-  document.getElementById("clock").textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const clock = document.getElementById("clock");
+  if (!clock.dataset.ready) {
+    clock.innerHTML = `<span class="dg"></span><span class="dg"></span><span class="colon">:</span><span class="dg"></span><span class="dg"></span>`;
+    clock.dataset.ready = "1";
+  }
+  const s = pad(now.getHours()) + pad(now.getMinutes());
+  clock.querySelectorAll(".dg").forEach((box, i) => setDigit(box, s[i]));
   document.getElementById("date").innerHTML =
-    `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日<span class="${dowClass(now)}">（${DOW[now.getDay()]}）</span>`;
+    `<span class="y">${now.getFullYear()}年</span><span class="md">${now.getMonth()+1}月${now.getDate()}日</span><span class="${dowClass(now)}">（${DOW[now.getDay()]}）</span>`;
+  fitDate();
+}
+/* 日付の横幅を時刻の横幅にぴったり合わせる */
+function fitDate() {
+  const date = document.getElementById("date"), clock = document.getElementById("clock");
+  const target = clock.getBoundingClientRect().width;
+  if (!target) return;
+  date.style.fontSize = "";
+  date.style.width = "";
+  const w = date.scrollWidth;
+  const size = parseFloat(getComputedStyle(date).fontSize) * target / w;
+  date.style.fontSize = size + "px";
+  date.style.width = target + "px";
 }
 
 /* ---------- 天気（Open-Meteo：APIキー不要） ---------- */
@@ -472,6 +535,29 @@ const WMO = c =>
   (c >= 80 && c <= 82) ? ["🌦️", "にわか雨"] :
   (c >= 85 && c <= 86) ? ["🌨️", "にわか雪"] :
   (c >= 95) ? ["⛈️", "雷雨"] : ["🌡️", "—"];
+
+/* 天気コード → 動くSVGアイコン */
+function wxIcon(c) {
+  const sun = (cx, cy, r) => `<g class="rays">${[0,45,90,135,180,225,270,315].map(a =>
+      `<line x1="${cx}" y1="${cy - r - 4}" x2="${cx}" y2="${cy - r - 9}" stroke="#FFB020" stroke-width="3.2" stroke-linecap="round" transform="rotate(${a} ${cx} ${cy})"/>`).join("")}</g>
+    <circle class="sunc" cx="${cx}" cy="${cy}" r="${r}" fill="#FFC83D"/>`;
+  const cloud = (dy = 0, fill = "#FFFFFF") => `<g class="cl"><path transform="translate(0 ${dy})" d="M19 46h27a10 10 0 0 0 1-20 14 14 0 0 0-27-2 11 11 0 0 0-1 22z"
+      fill="${fill}" stroke="#AEB9C4" stroke-width="2.4" stroke-linejoin="round"/></g>`;
+  const drops = (n, col = "#3B8FD9") => [24, 32, 40].slice(0, n).map((x, i) =>
+      `<line class="drop d${i + 1}" x1="${x}" y1="44" x2="${x - 2}" y2="50" stroke="${col}" stroke-width="3" stroke-linecap="round"/>`).join("");
+  const flakes = () => [24, 32, 40].map((x, i) => `<circle class="flake f${i + 1}" cx="${x}" cy="46" r="2.4" fill="#9CC7F0"/>`).join("");
+  let body;
+  if (c === 0 || c === 1) body = sun(32, 32, 11);
+  else if (c === 2) body = `${sun(24, 24, 9)}${cloud(6)}`;
+  else if (c === 3) body = `${cloud(0, "#EEF1F4")}`;
+  else if (c === 45 || c === 48) body = `${cloud(-6, "#EEF1F4")}<g class="fogl"><path d="M14 48h34M20 54h30" stroke="#AEB9C4" stroke-width="3" stroke-linecap="round"/></g>`;
+  else if (c >= 51 && c <= 57) body = `${cloud(-8)}${drops(2, "#6AAEE6")}`;
+  else if ((c >= 61 && c <= 67) || (c >= 80 && c <= 82)) body = `${cloud(-8)}${drops(3)}`;
+  else if ((c >= 71 && c <= 77) || c === 85 || c === 86) body = `${cloud(-8)}${flakes()}`;
+  else if (c >= 95) body = `${cloud(-8, "#DDE3EA")}<path class="bolt" d="M28 38l-6 10h5l-3 9 9-12h-5l3-7z" fill="#FFC83D" stroke="#E0A000" stroke-width="1.2" stroke-linejoin="round"/><path class="bolt b2" d="M42 39l-4.5 7.5h4l-2.5 7 7-9.5h-4l2.5-5z" fill="#FFC83D" stroke="#E0A000" stroke-width="1.2" stroke-linejoin="round"/>`;
+  else body = cloud(0, "#EEF1F4");
+  return `<svg class="wxi" viewBox="0 0 64 64" aria-hidden="true">${body}</svg>`;
+}
 
 let lastWx = null;
 async function loadWeather() {
@@ -501,7 +587,7 @@ function renderWeather() {
   const di = Math.max(0, j.daily.time.indexOf(todayKey));
 
   const [icon, cond] = WMO(j.daily.weather_code[di]);
-  document.getElementById("wx-icon").textContent = icon;
+  document.getElementById("wx-icon").innerHTML = wxIcon(j.daily.weather_code[di]);
   document.getElementById("wx-cond").textContent = cond;
   document.getElementById("wx-place").textContent = CONFIG.location.name;
   document.getElementById("wx-now").innerHTML = `${Math.round(j.current.temperature_2m)}<small>℃</small>`;
@@ -533,7 +619,7 @@ function renderWeather() {
     const c = slotCode(a, b, p);
     return `<div class="slot ${h >= b ? "past" : ""}">
       <div class="t">${a}–${b}時</div>
-      <div class="wi">${c == null ? "–" : WMO(c)[0]}</div>
+      <div class="wi">${c == null ? "–" : wxIcon(c)}</div>
       <div class="p">☂ ${p == null ? "--" : p + "%"}</div></div>`;
   }).join("");
 
@@ -547,7 +633,7 @@ function renderWeather() {
   const ti = di + 1;
   if (j.daily.time[ti]) {
     document.getElementById("wx-tmr").innerHTML =
-      `明日 ${WMO(j.daily.weather_code[ti])[0]} <span class="hi">${Math.round(j.daily.temperature_2m_max[ti])}</span>/`
+      `明日 <span class="ti">${wxIcon(j.daily.weather_code[ti])}</span> <span class="hi">${Math.round(j.daily.temperature_2m_max[ti])}</span>/`
       + `<span class="lo">${Math.round(j.daily.temperature_2m_min[ti])}</span>℃ ☂${j.daily.precipitation_probability_max[ti]}%`;
   }
   const st = document.getElementById("status");
@@ -617,9 +703,14 @@ setInterval(loadAlerts, 10 * 60 * 1000);
 // 画面を消さない（対応ブラウザのみ）
 async function keepAwake() { try { await navigator.wakeLock?.request("screen"); } catch (e) {} }
 keepAwake();
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") keepAwake(); });
-if (document.fonts) document.fonts.ready.then(fitNames);
-window.addEventListener("resize", fitNames);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible") return;
+  keepAwake();
+  // 画面に戻ってきた時、天気が15分以上前なら取り直す
+  if (!lastWx || Date.now() - lastWx._at > 15 * 60 * 1000) { loadWeather(); loadAlerts(); }
+});
+if (document.fonts) document.fonts.ready.then(() => { fitNames(); fitDate(); });
+window.addEventListener("resize", () => { fitNames(); fitDate(); });
 </script>
 </body>
 </html>
