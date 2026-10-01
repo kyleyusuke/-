@@ -88,6 +88,14 @@ const CONFIG = {
     rule: { everyOtherWeek: { weekday: 1, start: "2026-10-05" } },
   },
 
+  // ▼ 太陽光（パナソニックの発電モニターを中継役経由で取得）
+  //   url: 中継役が返すJSONのURL。未設定(null)の間は demo の値を表示
+  //   gridKw: ＋なら買電／−なら売電
+  solar: {
+    url: null,
+    demo: { genKw: 1.9, todayKwh: 1.2, gridKw: -1.5, useKw: 0.4 },
+  },
+
   // 収集お休みの日など（その日に出せるゴミの key を並べる。[] で「収集なし」）
   exceptions: {
     "2026-12-31": [], "2027-01-01": [], "2027-01-02": [], "2027-01-03": [],
@@ -96,7 +104,7 @@ const CONFIG = {
 </script>
 <style>
 :root{
-  --bg:#F4F1EB; --card:#FFFFFF; --ink:#1F1D1A; --sub:#7A746B; --line:#E4DED3;
+  --bg:#ECEAE5; --card:#FFFFFF; --ink:#1A1918; --sub:#8A857C; --line:#ECE8E1; --tint:#F5F3EF;
   --rain:#2F7DD1; --hot:#E4572E; --cold:#2F7DD1;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -106,10 +114,11 @@ body{
   font-family:"Noto Sans JP","Noto Sans CJK JP","Hiragino Sans",sans-serif;
   font-feature-settings:"palt"; overflow:hidden; -webkit-font-smoothing:antialiased;
 }
-.app{height:100vh;display:grid;grid-template-rows:minmax(0,1fr) auto auto auto;gap:2.2vh;padding:2.6vh 2.6vw}
+.app{height:100vh;display:flex;flex-direction:column;gap:2.2vh;padding:2.6vh 2.6vw}
+.app>*:not(main){flex:none}
 
 /* ===== メイン ===== */
-main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw;min-height:0}
+main{flex:1;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.2fr);gap:1.8vw;min-height:0}
 .hero{
   position:relative;border-radius:3.2vh;padding:2.6vh 2.2vw;display:flex;flex-direction:column;gap:1.6vh;
   color:#fff;min-height:0;overflow:hidden;box-shadow:0 calc(var(--u)*1.2) calc(var(--u)*3) rgba(0,0,0,.08);
@@ -167,7 +176,7 @@ main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw
 /* ===== 右：この先の予定 ===== */
 .side{--s:1vh;background:var(--card);border-radius:calc(var(--s)*3.2);padding:calc(var(--s)*2.6) calc(var(--s)*2.72);display:flex;flex-direction:column;min-height:0}
 .side h2{font-size:calc(var(--s)*2.6);color:var(--sub);font-weight:700;margin-bottom:calc(var(--s)*.6)}
-.days{flex:1;display:grid;grid-template-rows:repeat(6,minmax(0,1fr));min-height:0}
+.days{flex:1;display:grid;grid-template-rows:repeat(5,minmax(0,1fr));min-height:0}
 .day{font-size:calc(var(--s)*2.7);display:grid;grid-template-columns:6.2em 1fr;align-items:center;align-content:center;gap:calc(var(--s)*0.85);padding:calc(var(--s)*.6) 0;border-bottom:1px solid var(--line);min-height:0}
 .day:last-child{border-bottom:none}
 .day .d{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -182,6 +191,94 @@ main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw
 .day.first .d{font-size:1.12em}
 .day.first .chip{font-size:calc(var(--s)*2.7)}
 .day.first .chip .ci{width:calc(var(--s)*6.2);height:calc(var(--s)*4.4)}
+
+/* ===== 右カード：予定（細め）＋太陽光 ===== */
+.side{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.9fr);grid-template-rows:auto minmax(0,1fr);padding:calc(var(--s)*2.6) calc(var(--s)*2.6) calc(var(--s)*2.4)}
+.side h2{grid-column:1;grid-row:1;padding-right:calc(var(--s)*2.2)}
+.side .days{grid-column:1;grid-row:2;padding-right:calc(var(--s)*2.2)}
+.side .day{grid-template-columns:1fr;align-content:center;gap:calc(var(--s)*.7)}
+.solar{grid-column:2;grid-row:1/3;display:flex;flex-direction:column;min-height:0;padding-left:calc(var(--s)*2.4);border-left:1px solid var(--line)}
+.solar .sh{display:flex;justify-content:space-between;align-items:baseline}
+.solar .sh span{font-size:calc(var(--s)*1.6);color:#B3AEA5;font-weight:500;letter-spacing:.04em}
+.sbody{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:calc(var(--s)*1.2);min-height:0}
+.scard{background:var(--tint);border-radius:calc(var(--s)*2);min-width:0;min-height:0}
+.num{font-weight:600;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.025em;white-space:nowrap}
+.num small{font-size:calc(var(--s)*2.2);font-weight:600;letter-spacing:0;margin-left:.2em;color:var(--sub)}
+.lbl{font-size:calc(var(--s)*2.1);font-weight:700;color:#57534C;white-space:nowrap;letter-spacing:.04em}
+/* 左：発電 */
+.sgen{display:flex;flex-direction:column;justify-content:space-between;padding:calc(var(--s)*2.4) calc(var(--s)*2.2) calc(var(--s)*2.2)}
+.sgen .gi{align-self:center;width:calc(var(--s)*11);height:calc(var(--s)*9.4);margin:calc(var(--s)*.4) 0 0 calc(var(--s)*1.6)}
+.sgen .now{margin-top:calc(var(--s)*1)}
+.sgen .now .num{display:block;text-align:right;font-size:calc(var(--s)*7);margin-top:calc(var(--s)*.8)}
+.sgen .today{padding-top:calc(var(--s)*2);border-top:1px solid #E6E2DA}
+.sgen .today .num{display:block;text-align:right;font-size:calc(var(--s)*5.4);margin-top:calc(var(--s)*.8)}
+.sgen.off .gi{opacity:.35}
+.sgen.off .now .num{color:#C4BFB6}
+/* 右：買電（売電）→ 消費 */
+.sflow{position:relative;display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:calc(var(--s)*1.2);min-height:0}
+.srow{display:flex;flex-direction:column;justify-content:center;gap:calc(var(--s)*.6);padding:calc(var(--s)*2.2)}
+.srow .ri{align-self:center;width:calc(var(--s)*5.6);height:calc(var(--s)*5.6)}
+.srow .lbl{margin-top:calc(var(--s)*.8)}
+.srow{padding-left:calc(var(--s)*4.4)}
+.sgen{padding-right:calc(var(--s)*3.2)}
+.srow .num{align-self:flex-end;font-size:calc(var(--s)*7)}
+.srow .num.zero{color:#C4BFB6}
+.srow:first-child{padding-bottom:calc(var(--s)*3.8)}
+.srow:nth-child(2){padding-top:calc(var(--s)*3.8)}
+.arrows{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:calc(var(--s)*6.4);z-index:2;pointer-events:none}
+.arrows svg{height:100%;width:auto;overflow:visible;display:block}
+.arrows .c{animation:chev 1.5s ease-in-out infinite}
+.arrows .c2{animation-delay:.25s}.arrows .c3{animation-delay:.5s}
+.arrows.idle .c{animation:none;opacity:.15}
+@keyframes chev{0%{opacity:.1;transform:translateY(-4px)}45%{opacity:1}100%{opacity:.1;transform:translateY(4px)}}
+/* 発電 → 売電・消費 の横向き矢印（パナソニックと同じ流れ） */
+.sbody{position:relative}
+.harrow{position:absolute;left:50%;height:calc(var(--s)*5.4);transform:translate(-50%,-50%);z-index:2;pointer-events:none}
+.harrow.sell{top:calc((100% - var(--s)*1.2)/4)}
+.harrow.use{top:calc(100% - (100% - var(--s)*1.2)/4)}
+.harrow svg{height:100%;width:auto;overflow:visible;display:block}
+.harrow .c{animation:chevx 1.5s ease-in-out infinite}
+.harrow .c2{animation-delay:.25s}.harrow .c3{animation-delay:.5s}
+@keyframes chevx{0%{opacity:.1;transform:translateX(-4px)}45%{opacity:1}100%{opacity:.1;transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.arrows .c,.harrow .c{animation:none;opacity:.6}}
+
+/* --- 太陽光：文字を大きく、余白を詰める（上書き） --- */
+.lbl{font-size:calc(var(--s)*3);font-weight:700;color:#3F3C37;letter-spacing:.02em}
+.num{font-size:calc(var(--s)*8)}
+.num small{font-size:calc(var(--s)*2.9);margin-left:.15em}
+.sgen{justify-content:space-evenly;padding:calc(var(--s)*1.6) calc(var(--s)*3) calc(var(--s)*1.6) calc(var(--s)*2)}
+.sgen .gi{width:calc(var(--s)*14);height:calc(var(--s)*12);margin:0 0 0 calc(var(--s)*1.4)}
+.sgen .now{margin-top:0}
+.sgen .now .num{font-size:calc(var(--s)*9.4);margin-top:calc(var(--s)*.4)}
+.sgen .today{padding-top:calc(var(--s)*1.6)}
+.sgen .today .num{font-size:calc(var(--s)*6.6);margin-top:calc(var(--s)*.4)}
+.srow{justify-content:space-evenly;gap:0;padding:calc(var(--s)*1.4) calc(var(--s)*2) calc(var(--s)*1.4) calc(var(--s)*4.2)}
+.srow .ri{width:calc(var(--s)*7.4);height:calc(var(--s)*7.4)}
+.srow .lbl{margin-top:0}
+.srow .num{font-size:calc(var(--s)*8.4)}
+.srow:first-child{padding-bottom:calc(var(--s)*2.8)}
+.srow:nth-child(2){padding-top:calc(var(--s)*2.8)}
+.harrow{height:calc(var(--s)*5.6);left:calc(50% + var(--s)*1.4)}
+.sgen{padding-right:calc(var(--s)*3.2)}
+.srow{padding-left:calc(var(--s)*5.6)}
+.sgen .today .lbl{font-size:calc(var(--s)*2.6)}
+
+/* ===== 全体の仕上げ（フラット・余白と文字サイズの統一） ===== */
+.hero{border-radius:2.8vh;box-shadow:none}
+.hero.multi{background:#1F1E1C}
+.ico{box-shadow:none}
+.detail{border-radius:2.8vh}
+.grp li{background:var(--tint)}
+.noki{box-shadow:none;background-image:none;border-radius:1.8vh}
+.side{border-radius:2.8vh}
+.side h2,.solar .sh b{font-size:calc(var(--s)*2);font-weight:700;color:var(--sub);letter-spacing:.12em;margin-bottom:calc(var(--s)*1.4)}
+.day{border-bottom-color:var(--line)}
+.day .d{font-size:calc(var(--s)*2.5)}
+.day.first .d{font-size:calc(var(--s)*2.5)}
+.chip.none{color:#BDB8AF;font-weight:500}
+.bar{border-radius:2.8vh}
+.dt{border-right-color:var(--line)}
+.dt .date{color:#57534C}
 
 /* ===== インフォメーションバー ===== */
 .bar{background:var(--card);border-radius:3.2vh;padding:2vh 2.2vw;display:grid;
@@ -287,6 +384,7 @@ main{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:1.8vw
     <aside class="side">
       <h2>この先の予定</h2>
       <div class="days" id="days"></div>
+      <div class="solar" id="solar"></div>
     </aside>
   </main>
 
@@ -435,7 +533,7 @@ function fitSide() {
   if (!side) return;
   let s = window.innerHeight / 100;
   side.style.setProperty("--s", s + "px");
-  const over = () => [...side.querySelectorAll(".days,.day")].some(e => e.scrollHeight > e.clientHeight + 1);
+  const over = () => [...side.querySelectorAll(".days,.day,.solar,.sgen,.srow")].some(e => e.scrollHeight > e.clientHeight + 1);
   let guard = 0;
   while (over() && guard++ < 40) { s *= 0.96; side.style.setProperty("--s", s + "px"); }
 }
@@ -493,9 +591,9 @@ function renderGarbage(now) {
   document.getElementById("left").classList.toggle("has-detail", groups.length > 0);
   refit();
 
-  // この先の予定（メイン表示の翌日から6日分）
+  // この先の予定（メイン表示の翌日から5日分）
   let html = "";
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 5; i++) {
     const d = addDays(heroDay, i);
     const gs = garbageFor(d);
     const diff = Math.round((d - today) / 86400000);
@@ -733,6 +831,60 @@ async function loadAlerts() {
   }
 }
 
+/* ---------- 太陽光 ---------- */
+let solarData = null;
+async function loadSolar() {
+  const sc = CONFIG.solar; if (!sc) return;
+  if (!sc.url) { solarData = sc.demo ? { ...sc.demo, _demo: true } : null; renderSolar(); return; }
+  try {
+    const r = await fetch(sc.url, { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    solarData = await r.json(); solarData._at = new Date();
+  } catch (e) { if (solarData) solarData._stale = true; }
+  renderSolar();
+}
+const SOLAR_ICONS = {
+  gen: `<svg class="gi" viewBox="0 0 70 60" aria-hidden="true"><g stroke="#957428" stroke-width="3.6" stroke-linecap="round" fill="none">
+      <path d="M26 3v6M4 26h6M44 26h6M10.5 10.5l4 4M41.5 10.5l-4 4M10.5 41.5l4-4"/><path d="M19 37.5A13 13 0 1 1 38.5 20"/></g>
+      <g fill="#957428"><path d="M31 30h10l-3.2 9H27.8zM43.5 30h10l-3.2 9H40.3zM56 30h10l-3.2 9H52.8zM26 42.5h10l-3.2 9H22.8zM38.5 42.5h10l-3.2 9H35.3zM51 42.5h10l-3.2 9H47.8z"/></g></svg>`,
+  tower: c => `<svg class="ri" viewBox="0 0 48 48" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="24" cy="12" r="2.8" fill="${c}"/><path d="M17.5 6.5a9 9 0 0 0 0 11M30.5 6.5a9 9 0 0 1 0 11M12 2.5a15 15 0 0 0 0 19M36 2.5a15 15 0 0 1 0 19"/>
+      <path d="M24 15 13 44l11-6 11 6zM18.8 32h10.4M20.8 25.5h6.4"/></svg>`,
+  house: `<svg class="ri" viewBox="0 0 48 48" fill="none" stroke="#2F6CC9" stroke-width="3.8" stroke-linejoin="round" aria-hidden="true"><path d="M7 20 24 6l17 14v20a2 2 0 0 1-2 2H30V31h-12v11H9a2 2 0 0 1-2-2z"/></svg>`,
+  hchev: (a, b, c) => `<svg viewBox="0 0 52 40" fill="none" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path class="c c1" stroke="${a}" d="M5 5l12 15-12 15"/><path class="c c2" stroke="${b}" d="M20 5l12 15-12 15"/><path class="c c3" stroke="${c}" d="M35 5l12 15-12 15"/></svg>`,
+  chev: `<svg viewBox="0 0 40 52" fill="none" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path class="c c1" stroke="#C9DDF6" d="M5 5l15 12 15-12"/><path class="c c2" stroke="#A9C9F0" d="M5 20l15 12 15-12"/><path class="c c3" stroke="#86B2E8" d="M5 35l15 12 15-12"/></svg>`,
+};
+function renderSolar() {
+  const el = document.getElementById("solar"); if (!el) return;
+  const d = solarData;
+  const num = v => (v == null || isNaN(v)) ? "--" : Math.abs(Number(v)).toFixed(1);
+  const isZero = v => v != null && Math.abs(v) < 0.05;
+  const grid = d ? d.gridKw : null;
+  const sell = grid != null && grid < 0;
+  const buying = grid != null && !isZero(grid) && !sell;
+  const genOn = d && !isZero(d.genKw);
+  const gc = sell ? "#3A8F84" : "#C8602A";
+  const st = !d ? "未接続" : d._demo ? "サンプル" : d._stale ? "取得できません" : `${pad(d._at.getHours())}:${pad(d._at.getMinutes())} 更新`;
+  el.innerHTML = `<div class="sh"><b>太陽光</b><span>${st}</span></div>
+    <div class="sbody">
+      <div class="scard sgen ${isZero(d?.genKw) ? "off" : ""}">
+        ${SOLAR_ICONS.gen}
+        <div class="now"><div class="lbl">発電</div><div class="num">${num(d?.genKw)}<small>kW</small></div></div>
+        <div class="today"><div class="lbl">本日の発電量</div><div class="num">${num(d?.todayKwh)}<small>kWh</small></div></div>
+      </div>
+      <div class="sflow">
+        <div class="scard srow">${SOLAR_ICONS.tower(gc)}<div class="lbl">${sell ? "売電" : "買電"}</div><div class="num ${isZero(grid) ? "zero" : ""}">${num(grid)}<small>kW</small></div></div>
+        <div class="scard srow">${SOLAR_ICONS.house}<div class="lbl">消費</div><div class="num">${num(d?.useKw)}<small>kW</small></div></div>
+        ${buying ? `<div class="arrows">${SOLAR_ICONS.chev}</div>` : ""}
+      </div>
+      ${sell ? `<div class="harrow sell">${SOLAR_ICONS.hchev("#CFF1EC", "#9EE2D8", "#5FCDBE")}</div>` : ""}
+      ${genOn ? `<div class="harrow use">${SOLAR_ICONS.hchev("#DCE8F9", "#B3CDF2", "#7FAAE8")}</div>` : ""}
+    </div>`;
+  fitSide();
+}
+
 /* ---------- ループ ---------- */
 let lastMinute = -1;
 function tick() {
@@ -751,6 +903,8 @@ loadWeather();
 setInterval(loadWeather, 30 * 60 * 1000);
 loadAlerts();
 setInterval(loadAlerts, 10 * 60 * 1000);
+loadSolar();
+setInterval(loadSolar, 60 * 1000);
 // 画面を消さない（対応ブラウザのみ）
 async function keepAwake() { try { await navigator.wakeLock?.request("screen"); } catch (e) {} }
 keepAwake();
